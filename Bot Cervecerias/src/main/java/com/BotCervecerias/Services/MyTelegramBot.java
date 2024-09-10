@@ -1,15 +1,22 @@
 package com.BotCervecerias.Services;
 
-import com.BotCervecerias.Models.Users;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.client.RestTemplate;
+import com.BotCervecerias.CommandsTG.RegisterBeers;
+import com.BotCervecerias.CommandsTG.RegisterCommand;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
+import java.util.HashMap;
+import java.util.Map;
+
 public class MyTelegramBot extends TelegramLongPollingBot {
+
+
+    private  RegisterCommand registerCommand=new RegisterCommand() ;
+    private RegisterBeers registerBeerCommand=new RegisterBeers();
+    private Map<Long, String> userState = new HashMap<>();
+
     @Override
     public String getBotUsername() {
         return "BreweriessBot";
@@ -22,53 +29,40 @@ public class MyTelegramBot extends TelegramLongPollingBot {
 
     @Override
     public void onUpdateReceived(Update update) {
-        if (update.hasMessage()&&update.getMessage().hasText()){
-            String messageText=update.getMessage().getText();
-            Long chatId=update.getMessage().getChatId();
+        if (update.hasMessage() && update.getMessage().hasText()) {
+            String messageText = update.getMessage().getText();
+            Long chatId = update.getMessage().getChatId();
+            if (userState.containsKey(chatId)) {
+                String state = userState.get(chatId);
 
-            if (messageText.startsWith("/register")){
-                sendMessage(chatId, """
-                        ingrese los siguientes datos:
-                        Nombre
-                        Correo
-                        Tipo de Usuario(Organización o Cervecería""");
+                if (state.equals("register")) {
+                    // Procesar los datos de registro de usuario
+                    registerCommand.handleRegistration(messageText, chatId, this);
+                    userState.remove(chatId); // Limpiar estado después del registro
+                } else if (state.equals("Beerregister")) {
+                    // Procesar los datos de registro de cerveza
+                    registerBeerCommand.handleBeerRegistration(messageText, chatId, this);
+                    userState.remove(chatId); // Limpiar estado después del registro
+                }
+            } else {
+                if (messageText.startsWith("/Beerregister")) {
+                    sendMessage(chatId, """
+                            Ingresa los detalles de la cerveza en el siguiente formato:
+                            Nombre Tipo GradoAlcohol BTU Descripción URLImagen""");
+                    userState.put(chatId, "Beerregister");
 
-                handleRegistration(messageText,chatId);
+                }else if (messageText.startsWith("/register")) {
+                    sendMessage(chatId, """
+                            ingrese los siguientes datos:
+                            Nombre
+                            Correo
+                            Tipo de Usuario(1=Organización o 2=Cervecería)""");
+                    userState.put(chatId, "register");
+                }
             }
         }
     }
-
-    private  void handleRegistration(String messageText,Long chatId){
-        String[] parts=messageText.split(" ");
-        if (parts.length<5){
-            sendMessage(chatId,"Formato no valido. Usa: /register nombre correo contraseña tipo_de_usuario");
-            return;
-        }
-        String nombre=parts[1];
-        String correo=parts[2];
-        String password =parts[3];
-        String userType=parts[4].toUpperCase();
-
-        Users newUser=new Users();
-        newUser.setName(nombre);
-        newUser.setEmail(correo);
-        newUser.setPassword(password);
-        newUser.setUsersTypeName(String.valueOf(userType.equals("CERVECERIA")?1:2));
-
-        try {
-            RestTemplate restTemplate=new RestTemplate();
-            String url="http://localhost:8080/api/auth/register";
-            ResponseEntity<Users> response=restTemplate.postForEntity(url,newUser,Users.class);
-            if (response.getStatusCode()== HttpStatus.OK){
-                sendMessage(chatId,"Registro exitoso");
-            }
-        }catch (Exception e){
-            sendMessage(chatId,"Error en el registro: "+ e.getMessage());
-        }
-    }
-
-
-    private void sendMessage(Long chatId, String text) {
+    public void sendMessage (Long chatId, String text){
         SendMessage message = new SendMessage();
         message.setChatId(chatId.toString());
         message.setText(text);

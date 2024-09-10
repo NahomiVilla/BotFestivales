@@ -5,7 +5,6 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.w3c.dom.Text;
 
 @Data
 @AllArgsConstructor
@@ -20,7 +19,9 @@ public class Companies {
     private String name;
     private  String tipo;
     private String logo;
-    private Text addres;
+    private String addres;
+    @ManyToOne
+    @JoinColumn(name = "users")
     private Users users;
 
     public Long getUsers() {

@@ -21,6 +21,8 @@ public class Events {
     private String name;
     private String description;
     private Date date;
+    @ManyToOne
+    @JoinColumn(name = "companies")
     private Companies companies;
 
 

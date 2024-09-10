@@ -17,7 +17,11 @@ public class EventBreweries {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+    @ManyToOne
+    @JoinColumn(name = "companies")
     private Companies brewer;
+    @ManyToOne
+    @JoinColumn(name = "events")
     private Events events;
 
     public Long getBrewer() {

@@ -1,6 +1,7 @@
 package com.BotCervecerias.Models;
 
 import jakarta.persistence.*;
+import  jakarta.persistence.GenerationType;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
@@ -27,18 +28,23 @@ public class Users {
     private  String email;
     private  String password;
     @ManyToOne
-    @JoinColumn(name = "user_type")
+    @JoinColumn(name = "usertype")
     private UsersType usersType;
-    private Date created_date=new Date(System.currentTimeMillis());
+    @Temporal(TemporalType.TIMESTAMP)
+    private Date created_date;
 
-    public void setUsersTypeName(String usersType) {
+    @PrePersist
+    protected  void onCreate(){
+        this.created_date=new Date();
+    }
+    public void setUsersTypeId(Long usersType) {
         if (this.usersType == null) {
             this.usersType = new UsersType();
         }
-        this.usersType.setName(usersType);
+        this.usersType.setId(usersType);
     }
 
-    public String getUsersTypeName() {
-        return usersType != null ? usersType.getName():null;
+    public Long getUsersTypeId() {
+        return usersType != null ? usersType.getId():null;
     }
 }
