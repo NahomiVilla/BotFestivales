@@ -6,5 +6,10 @@ public class Exceptions {
             super(message);
         }
     }
+    public static class UserTypeNotFoundException extends RuntimeException {
+        public UserTypeNotFoundException(String message) {
+            super(message);
+        }
+    }
 
 }

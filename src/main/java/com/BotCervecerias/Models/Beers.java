@@ -21,8 +21,8 @@ public class Beers {
     @ManyToOne
     @JoinColumn(name = "beers_type")
     private BeersType beersType;
-    private Boolean alcohol_grad;
-    private Boolean btu;
+    private Double alcohol_grad;
+    private Double btu;
     private String description;
     private String image;
     @ManyToOne
@@ -32,19 +32,34 @@ public class Beers {
     public Long getCompanies() {
         return companies != null ? companies.getId():null;
     }
+    public String getCompaniesName() {
+        return companies != null ? companies.getName():null;
+    }
+
     public void setCompanies(Long user) {
         if (this.companies == null) {
             this.companies = new Companies();
         }
         this.companies.setId(user);
     }
-    public Long getBeersTypeID() {
+    public Long getBeersTypeId() {
         return beersType != null ? beersType.getId():null;
     }
-    public void setBeersTypeID(Long beersType) {
+
+    public void setBeersTypeId(Long beersType) {
         if (this.beersType == null) {
             this.beersType = new BeersType();
         }
         this.beersType.setId(beersType);
     }
+    public void setBeersTypeName(String tipo) {
+        if (this.beersType==null){
+            this.beersType=new BeersType();
+        }this.beersType.setName(tipo);
+    }
+    public String getBeersTypeName() {
+        return beersType != null ? beersType.getName():null;
+    }
+
+
 }

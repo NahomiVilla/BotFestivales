@@ -1,19 +1,16 @@
 package com.BotCervecerias.Config;
 
-import com.BotCervecerias.Services.UserDatails;
 import com.BotCervecerias.security.filters.JwtAuthenticationFilter;
 import com.BotCervecerias.security.filters.JwtAuthorizationFilter;
 import com.BotCervecerias.security.jwt.JwtUtils;
-import jakarta.servlet.Filter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
-import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
@@ -28,8 +25,7 @@ public class SecurityConfig {
     @Autowired
     JwtUtils jwtUtils;
 
-    @Autowired
-    UserDatails userDetailService;
+
 
     @Autowired
     JwtAuthorizationFilter authorizationFilter;
@@ -53,7 +49,10 @@ public class SecurityConfig {
                 .csrf(csrf -> csrf.disable())
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .authorizeHttpRequests(auth -> {
-                    auth.requestMatchers("/api/auth/register").permitAll();
+                    auth.requestMatchers("/api/auth/**","/login").permitAll();
+                    auth.requestMatchers("/api/beer/**","/api/beer//DeleteBeer/{nombreCerveza}").hasRole("CERVECERIA");
+                    auth.requestMatchers("/api/events/register","api/events/**").hasRole("ORGANIZACION");
+                    auth.requestMatchers("/api/users/**","/api/companies/**").hasAnyRole("CERVECERIA","ORGANIZACION");
                     auth.anyRequest().authenticated();
                 })
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))

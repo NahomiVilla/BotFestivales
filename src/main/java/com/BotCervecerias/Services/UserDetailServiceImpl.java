@@ -23,7 +23,7 @@ public class UserDetailServiceImpl implements UserDetailsService {
     private UserRepository userRepository;
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        return loadUserByEmail(username);  // Delegate to loadUserByEmail
+        return loadUserByEmail(username);
     }
 
     public UserDetails loadUserByEmail(String email) throws Exceptions.EmailNotFoundException {

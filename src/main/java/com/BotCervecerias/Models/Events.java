@@ -1,12 +1,13 @@
 package com.BotCervecerias.Models;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Data
 @AllArgsConstructor
@@ -20,20 +21,55 @@ public class Events {
     private Long id;
     private String name;
     private String description;
+    @Temporal(TemporalType.TIMESTAMP)
     private Date date;
+    private String direction;
     @ManyToOne
     @JoinColumn(name = "companies")
-    private Companies companies;
+    @ToString.Exclude
+    private Companies organizer;
+
+    private Boolean active;
+
+    @ManyToMany
+
+    @JoinTable(name="events_breweries",joinColumns = @JoinColumn(name="event_id"),inverseJoinColumns = @JoinColumn(name = "company_id"))
+    @JsonIgnore
+    @ToString.Exclude
+    private List<Companies>breweries;
 
 
-    public Long getCompanies() {
-        return companies != null ? companies.getId():null;
+
+
+    public List<Long> getBreweriesIds() {
+        return breweries != null ?new ArrayList<>( breweries.stream().map(Companies::getId).toList()) : null;
     }
-    public void setCompanies(Long companies) {
-        if (this.companies == null) {
-            this.companies = new Companies();
+
+    public void setBreweriesByIds(List<Long> breweriesIds) {
+        this.breweries = breweriesIds.stream().map(id -> {
+            Companies company = new Companies();
+            company.setId(id);
+            return company;
+        }).collect(Collectors.toList());
+    }
+    public List<String> getBreweriesNames() {
+        return breweries != null ?new ArrayList<>( breweries.stream()
+                .map(Companies::getName)
+                .toList()) : null;
+    }
+    public void setBreweriesNames(List<String> breweriesNames){
+        this.breweries = breweriesNames.stream().map(name -> {
+            Companies company = new Companies();
+            company.setName(name);
+            return company;
+        }).collect(Collectors.toList());
+    }
+    public void setOrganizerName(String organizer) {
+        if (this.organizer == null) {
+            this.organizer = new Companies();
         }
-        this.companies.setId(companies);
+        this.organizer.setCompanyName(organizer);
     }
+
 
 }

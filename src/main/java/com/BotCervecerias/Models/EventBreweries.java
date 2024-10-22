@@ -1,5 +1,6 @@
 package com.BotCervecerias.Models;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -11,36 +12,24 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @Builder
 @Entity
-@Table(name="events-breweries")
+@Table(name="events_breweries")
+@JsonIgnoreProperties({"events"})
 public class EventBreweries {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     @ManyToOne
-    @JoinColumn(name = "companies")
+    @JoinColumn(name = "company_id")
     private Companies brewer;
     @ManyToOne
-    @JoinColumn(name = "events")
+    @JoinColumn(name = "event_id")
     private Events events;
 
-    public Long getBrewer() {
-        return brewer != null ? brewer.getId():null;
-    }
-    public void setBrewer(Long brewer) {
-        if (this.brewer == null) {
-            this.brewer = new Companies();
-        }
-        this.brewer.setId(brewer);
+    @Override
+    public String toString() {
+        return "EventBreweries{id=" + id + ", brewer=" + (brewer != null ? brewer.getName() : "null") +
+                ", events=" + (events != null ? events.getName() : "null") + "}";
     }
 
-    public Long getEvents() {
-        return events != null ? events.getId():null;
-    }
-    public void setEvents(Long event) {
-        if (this.events == null) {
-            this.events = new Events();
-        }
-        this.events.setId(event);
-    }
 }

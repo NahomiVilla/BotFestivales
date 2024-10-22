@@ -1,6 +1,6 @@
 package com.BotCervecerias;
 
-import com.BotCervecerias.CommandsTG.RegisterCommand;
+import com.BotCervecerias.CommandsTG.LoginCommands;
 import com.BotCervecerias.Services.MyTelegramBot;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -17,7 +17,8 @@ public class MyBotApplication {
         try {
             // Inicializar el contexto de Telegram y registrar el bot
             TelegramBotsApi botsApi = new TelegramBotsApi(DefaultBotSession.class);
-            botsApi.registerBot(new MyTelegramBot());
+            LoginCommands login=new LoginCommands();
+            botsApi.registerBot(new MyTelegramBot(login));
 
             System.out.println("Bot iniciado con éxito.");
         } catch (TelegramApiException e) {

@@ -68,7 +68,7 @@ public class JwtUtils {
 
     //Obtener el rol del token
     public String getUserRole(String token) {
-        return getClaim(token, claims -> claims.get("role", String.class));
+        return getClaim(token, claims -> claims.get("type", String.class));
     }
 
     //Obtener un solo claim
